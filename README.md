@@ -9,7 +9,7 @@ For more about data.tree, please refer to https://cran.r-project.org/web/package
 
 ## About the function
 You need to provide 4 inputs to the BIRCH clustering function:
-  1. a dataframe that you want to do clusering. 
+  1. data which is a dataframe that you want to do clusering. 
   2. BrachingFactor which is the maximum children allowed for a non-leaf node.
   3. LeafEntries which is the maximum entries(CFs) allowed for a leaf node.
   4. Threshold which is an upper limit to the radius of a CF.
