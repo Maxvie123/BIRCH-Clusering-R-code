@@ -4,19 +4,19 @@
 # To use this code, you need to source this file.
 #
 # Author: Jingwei Liu
-# Version: V1.0
-# Last update: 7/23/2020
+# Version: V1.1
+# Last update: 8/06/2020
 ################################################################################################
 
 
 
 # main function
 # data is the data you want to do clustering
-# BrachingFactor is the maximum children allowed for non-leaf node
+# BranchingFactor is the maximum children allowed for non-leaf node
 # LeafEntries is the maximum entries(CFs) allowed for leaf node
 # Threshold is an upper limit to the radius of cluster in CF
-BIRCHCluster = function(data, BrachingFactor, LeafEntries,Threshold){
-  B <- BrachingFactor
+BIRCHCluster = function(data, BranchingFactor, LeafEntries,Threshold){
+  B <- BranchingFactor
   L <- LeafEntries
   T <- Threshold
   df <- as.data.frame(data)
@@ -95,10 +95,10 @@ InitialTree = function(firstpoint){
 # build the tree
 # datapoint is the row values of one observation.
 # tree is the data.tree structure
-# BrachingFactor is the maximum children allowed for non-leaf node
+# BranchingFactor is the maximum children allowed for non-leaf node
 # LeafEntries is the maximum entries(CFs) allowed for leaf node
 # Threshold is an upper limit to the radius of cluster in CF
-BuildTree = function(datapoint, tree, BrachingFactor, LeafEntries,Threshold){
+BuildTree = function(datapoint, tree, BranchingFactor, LeafEntries,Threshold){
 
   # find the target CF
   BaseNode <- FindNode(tree, "Tree")
@@ -124,12 +124,12 @@ BuildTree = function(datapoint, tree, BrachingFactor, LeafEntries,Threshold){
   }
   
   # check if split non-leaf needed
-  if(NLNNode$count > BrachingFactor ){
+  if(NLNNode$count > BranchingFactor ){
     SplitNode(NLNNode)
   }
   
   # check if split root needed
-  if (RootNode$count > BrachingFactor){
+  if (RootNode$count > BranchingFactor){
     SplitNode(RootNode)
   }
   
@@ -354,5 +354,44 @@ UpdateAttr = function(Node){
 GetObs = function(df,Node){
   return(df[Node$List,])
 }
+
+
+# get the dataframe for a level of Node
+# tree is the data.tree
+# level is the level of the node: 
+#   1 is Base node
+#   2 is Root node
+#   3 is Non-leaf node
+#   4 is Leaf node
+#   5 is CF node
+# dimension is the dimension of the data
+ToDataFrameByLevel = function(tree,level){
+  
+  # create the dataframe that contains the level and node name 
+  df <- ToDataFrameTree(tree, "name","level")
+  mask <- df$level == level
+  newdf <- df[mask,c("name","level")]
+  row.names(newdf) <- NULL
+  
+  # Add new columns to store center values
+  dimension <- length(tree$Center)
+  for (i in 1:dimension){
+    NewColName <-  paste("Center", i, sep="")
+    newdf[NewColName] <- 0
+  }
+  
+  # Add the center values to the dataframe
+  for (i in rownames(newdf)){
+    TargetNode <- FindNode(tree, newdf[i,]$name)
+    for (j in 1:dimension){
+      ColName <- paste("Center", j, sep="")
+      newdf[i,ColName] <- TargetNode$Center[j]
+    }
+  }
+  
+  return(newdf[,-2])
+}
+
+
 
 

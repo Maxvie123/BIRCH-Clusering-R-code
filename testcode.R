@@ -6,7 +6,7 @@ library(igraph)
 
 # make sure your working directory is correct
 getwd()
-setwd('C:/Users/Jingwei Liu/OneDrive - Auburn University/INSY7130/Class materials/BIRCH clustering')
+setwd('C:/Users/Jingwei Liu/OneDrive - Auburn University/INSY7130/Class materials/BIRCH clustering/BIRCH-Clustering-R-code')
 getwd()
 
 
@@ -26,12 +26,12 @@ sample.id <- sample(1:n, s_size, replace = FALSE) #sampling
 sample.id
 
 #Filter only the selected ID's
-samplenewfile <- newfile[sample.id, 1:2] # get samples from iris dataset
+samplenewfile <- newfile[sample.id, 1:2] # get samples from dataset
 View(samplenewfile) #We can view the sample of the dataset
 
 
 # do BIRCH clustering
-tree <- BIRCHCluster(samplenewfile,BrachingFactor = 3, LeafEntries = 6, Threshold = 2)
+tree <- BIRCHCluster(samplenewfile,BranchingFactor = 3, LeafEntries = 6, Threshold = 2)
 tree
 
 # you can check what custom field in this tree
@@ -71,3 +71,11 @@ df <- GetObs(newfile,TargetCluster)
 table(df$Class)
 
 
+# get the all same level node centers to a dataframe. You can use this dataframe for further clustering method
+# level is the level of the node: 
+#   1 is Base node
+#   2 is Root node
+#   3 is Non-leaf node
+#   4 is Leaf node
+#   5 is CF node
+CFcenter <- ToDataFrameByLevel(tree,level = 5)
