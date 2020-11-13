@@ -3,10 +3,11 @@ library(DiagrammeR)
 library(reshape2)
 library(readxl)
 library(igraph)
+library(dplyr)
 
 # make sure your working directory is correct
 getwd()
-setwd('C:/Users/Jingwei Liu/OneDrive - Auburn University/INSY7130/Class materials/BIRCH clustering/BIRCH-Clustering-R-code')
+setwd('C:/Users/maxvi/OneDrive - Auburn University/INSY7130/Class materials/BIRCH clustering/BIRCH-Clustering-R-code')
 getwd()
 
 
@@ -21,12 +22,12 @@ n
 
 #For example, if we only work with a subset of obs. we draw a sample of size n without replacement from the ID's of the data (i.e. the number of the row)
 set.seed(3) #Set the seed to replicate results
-s_size = 300 # sample size
+s_size = 100 # sample size
 sample.id <- sample(1:n, s_size, replace = FALSE) #sampling
 sample.id
 
 #Filter only the selected ID's
-samplenewfile <- newfile[sample.id, 1:2] # get samples from dataset
+samplenewfile <- newfile[sample.id, 1:4] # get samples from dataset
 View(samplenewfile) #We can view the sample of the dataset
 
 
@@ -66,10 +67,34 @@ plot(as.igraph(tree, directed = TRUE, direction = "climb"))
 
 ############################################################################################################################################
 # if the data has a certain class, you can check how the observations locate in each cluster
-TargetCluster <- FindNode(tree,"LN5")
+TargetCluster <- FindNode(tree,"CF1")
 df <- GetObs(newfile,TargetCluster)
 table(df$Class)
 
+# get the purity infomation for all nodes
+# initialize the dataframe, this initialization is only used for Iris dataset. For other datasets, you need to 
+# modify the initialization code
+fdf <- data.frame(
+  NodeName = character(),
+  Iris.setosa = integer(),
+  Iris.versicolor = integer(),
+  Iris.virginica = integer(),
+  stringsAsFactors=FALSE)
+  
+NodeNumber <- length(tree$Get('name'))
+for (i in 2:NodeNumber){
+  NodeName <- tree$Get('name')[i]
+  TargetCluster <- FindNode(tree,NodeName)
+  df <- GetObs(newfile,TargetCluster)
+  # get node name dataframe
+  namedf <- data.frame(NodeName, row.names = 1)
+  # get node cluster dataframe
+  clusterdf <- data.frame(t(c(table(df$Class))))
+  fdf <- full_join(fdf, cbind(namedf, clusterdf))
+  
+}
+
+fdf
 
 # get the all same level node centers to a dataframe. You can use this dataframe for further clustering method
 # level is the level of the node: 
@@ -79,3 +104,4 @@ table(df$Class)
 #   4 is Leaf node
 #   5 is CF node
 CFcenter <- ToDataFrameByLevel(tree,level = 5)
+

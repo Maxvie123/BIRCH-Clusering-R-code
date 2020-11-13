@@ -4,8 +4,8 @@
 # To use this code, you need to source this file.
 #
 # Author: Jingwei Liu
-# Version: V1.1
-# Last update: 8/06/2020
+# Version: V1.2
+# Last update: 11/12/2020
 ################################################################################################
 
 
@@ -181,7 +181,7 @@ ComputeRadius = function(N,LS,SS){
     return(0)
   } else{
     X = SS - ((LS*LS)/N)
-    R = sqrt(sum(X)/N)
+    R = sqrt(pmax(0,sum(X)/N))
     return(R)
   }
 }
